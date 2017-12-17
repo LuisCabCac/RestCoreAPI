@@ -2,25 +2,24 @@
 using Microsoft.AspNetCore.Mvc;
 using RestCore.Models.Logger;
 using RestCore.Models.Users;
-using Microsoft.Extensions.Caching.Memory;
 
 namespace RestCore.Controllers
 {
     [Route("api/[controller]")]
     public class UserController : Controller
     {
-        private UserManager userManager = null;
+        private readonly IUserManager UserManager = null;
 
-        public UserController(IMemoryCache memoryCache)
+        public UserController(IUserManager userManager)
         {
-            userManager = new UserManager(memoryCache);
+            this.UserManager = userManager;
         }
 
         // GET: api/user 
         [HttpGet]
         public IActionResult GetAll()
         {
-            return Ok(userManager.GetAll());
+            return Ok(UserManager.GetAll());
 
         }
 
@@ -33,10 +32,10 @@ namespace RestCore.Controllers
                 if (id < 0)
                     return BadRequest();
 
-                if (!userManager.Exist(id))
+                if (!UserManager.Exist(id))
                     return NotFound();
                 else
-                    return Ok(userManager.GetFirstId(id));
+                    return Ok(UserManager.GetFirstId(id));
             }
             catch (Exception ex)
             {
@@ -56,8 +55,8 @@ namespace RestCore.Controllers
                 if (value == null || string.IsNullOrEmpty(value.Name) || string.IsNullOrEmpty(value.BirthDate))
                     return BadRequest();
 
-                int id = userManager.Add(value.Name, value.BirthDate);
-                return Ok(userManager.GetLastId(id));
+                int id = UserManager.Add(value.Name, value.BirthDate);
+                return Ok(UserManager.GetLastId(id));
             }
             catch (Exception ex)
             {
@@ -78,13 +77,13 @@ namespace RestCore.Controllers
                 if (value == null || value.Id==0)
                     return BadRequest();
 
-                if (!userManager.Exist(value.Id))
+                if (!UserManager.Exist(value.Id))
                     return NotFound();
                 else
                 {
-                    userManager.Update(value);
+                    UserManager.Update(value);
                     //Only return the first record with this Id
-                    return Ok(userManager.GetFirstId(value.Id));
+                    return Ok(UserManager.GetFirstId(value.Id));
                 }
             }
             catch (Exception ex)
@@ -106,11 +105,11 @@ namespace RestCore.Controllers
                 if (id < 0)
                     return BadRequest();
 
-                if (!userManager.Exist(id))
+                if (!UserManager.Exist(id))
                     return NotFound();
                 else
                 {
-                    userManager.Delete(id);
+                    UserManager.Delete(id);
                     return Ok();
                 }
             }

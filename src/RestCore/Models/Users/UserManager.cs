@@ -6,7 +6,18 @@ using System.Linq;
 
 namespace RestCore.Models.Users
 {
-    public class UserManager
+    public interface IUserManager
+    {
+        List<UserModel> GetAll();
+        UserModel GetFirstId(int id);
+        UserModel GetLastId(int id);
+        bool Exist(int id);
+        int Add(string Name, string BirthDate);
+        void Update(UserModel user);
+        void Delete(int id);
+    }
+
+    public class UserManager : IUserManager
     {
         private MemoryManager memoryManager;
 
